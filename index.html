@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090909">
+<meta name="description" content="FocusLite — a minimalist productivity app to organize your day.">
+<title>FocusLite — Stay Focused</title>
+
+<style>
+:root {
+  --bg: #090909;
+  --panel: #111111;
+  --border: #262626;
+  --text: #f5f5f5;
+  --muted: #858585;
+  --accent: #d5ff40;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  min-height: 100vh;
+}
+
+button, input, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  width: min(100% - 36px, 900px);
+  margin: 0 auto;
+  padding: 36px 0 60px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.logo span {
+  color: var(--accent);
+}
+
+.badge {
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.hero {
+  padding: 55px 0 32px;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+h1 {
+  font-size: clamp(36px, 7vw, 60px);
+  line-height: 1.05;
+  letter-spacing: -3px;
+  margin-bottom: 15px;
+}
+
+h1 span {
+  color: var(--muted);
+}
+
+.subtitle {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 30px 0;
+}
+
+.stat {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 14px;
+}
+
+.stat-number {
+  font-size: 29px;
+  font-weight: 750;
+  margin-bottom: 6px;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.progress-track {
+  height: 5px;
+  background: #292929;
+  border-radius: 10px;
+  margin-top: 14px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width .3s;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 18px;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+h2 {
+  font-size: 18px;
+}
+
+.small-muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.task-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
+input, select {
+  background: #191919;
+  color: var(--text);
+  border: 1px solid #303030;
+  border-radius: 10px;
+  padding: 13px;
+  outline: none;
+  min-width: 0;
+}
+
+input:focus, select:focus {
+  border-color: var(--accent);
+}
+
+input::placeholder {
+  color: #666;
+}
+
+.primary {
+  background: var(--accent);
+  color: #111;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 20px;
+  font-weight: 750;
+  transition: opacity .2s;
+}
+
+.primary:hover {
+  opacity: .85;
+}
+
+.form-options {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.form-options select {
+  flex: 1;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.filter.active {
+  background: var(--accent);
+  color: #111;
+  border-color: var(--accent);
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: border-color .2s;
+}
+
+.task:hover {
+  border-color: #484848;
+}
+
+.checkbox {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  padding: 0;
+  border: 1px solid #555;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.checkbox:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.checkbox:checked::after {
+  content: "✓";
+  display: block;
+  color: #111;
+  text-align: center;
+  line-height: 18px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.task-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-title {
+  overflow-wrap: anywhere;
+  font-size: 14px;
+}
+
+.task.completed .task-title {
+  text-decoration: line-through;
+  color: #777;
+}
+
+.task-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 7px;
+}
+
+.tag {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.priority {
+  font-size: 10px;
+  padding: 4px 7px;
+  border-radius: 5px;
+  background: #252525;
+}
+
+.priority.High {
+  color: #ff7777;
+}
+
+.priority.Medium {
+  color: #ffd166;
+}
+
+.priority.Low {
+  color: #a0a0a0;
+}
+
+.delete-btn {
+  background: transparent;
+  border: 0;
+  color: #777;
+  font-size: 18px;
+  padding: 6px;
+}
+
+.delete-btn:hover {
+  color: #ff7777;
+}
+
+.empty {
+  text-align: center;
+  padding: 35px 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+footer {
+  text-align: center;
+  padding-top: 25px;
+  color: #666;
+  font-size: 12px;
+}
+
+footer span {
+  color: var(--accent);
+}
+
+@media (max-width: 520px) {
+  .app {
+    width: calc(100% - 24px);
+    padding-top: 20px;
+  }
+
+  .hero {
+    padding-top: 38px;
+  }
+
+  h1 {
+    letter-spacing: -2px;
+  }
+
+  .stats {
+    gap: 7px;
+  }
+
+  .stat {
+    padding: 13px 10px;
+  }
+
+  .stat-number {
+    font-size: 23px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+
+  .task-form {
+    grid-template-columns: 1fr;
+  }
+
+  .primary {
+    min-height: 45px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <header>
+    <div class="logo">focus<span>lite.</span></div>
+    <div class="badge">YOUR PERSONAL WORKSPACE</div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">LESS DISTRACTION. MORE PROGRESS.</div>
+    <h1>Make today <span>count.</span></h1>
+    <p class="subtitle" id="today"></p>
+  </section>
+
+  <section class="stats">
+    <div class="stat">
+      <div class="stat-number" id="total">0</div>
+      <div class="stat-label">TOTAL TASKS</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-number" id="completed">0</div>
+      <div class="stat-label">COMPLETED</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-number" id="percentage">0%</div>
+      <div class="stat-label">YOUR PROGRESS</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-heading">
+      <h2>Create a task</h2>
+      <span class="small-muted">MAKE IT HAPPEN</span>
+    </div>
+
+    <form id="taskForm">
+      <div class="task-form">
+        <input
+          id="taskInput"
+          type="text"
+          maxlength="200"
+          placeholder="What do you need to get done?"
+          required
+          autocomplete="off"
+        >
+        <button class="primary" type="submit">+ Add task</button>
+      </div>
+
+      <div class="form-options">
+        <select id="priorityInput" aria-label="Task priority">
+          <option value="Low">Low priority</option>
+          <option value="Medium" selected>Medium priority</option>
+          <option value="High">High priority</option>
+        </select>
+
+        <input id="dateInput" type="date" aria-label="Due date">
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="panel-heading">
+      <h2>Your tasks</h2>
+      <div class="filters">
+        <button class="filter active" data-filter="all">All</button>
+        <button class="filter" data-filter="active">Active</button>
+        <button class="filter" data-filter="completed">Done</button>
+      </div>
+    </div>
+
+    <div class="task-list" id="taskList"></div>
+  </section>
+
+  <footer>
+    Built for focus. Designed for progress. <span>✳</span>
+    <br><br>
+    FocusLite — Open Source
+  </footer>
+
+</div>
+
+<script>
+const STORAGE_KEY = "focuslite_tasks_v1";
+
+let tasks = [];
+let currentFilter = "all";
+
+try {
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  if (Array.isArray(saved)) {
+    tasks = saved.filter(task =>
+      task &&
+      typeof task.id === "string" &&
+      typeof task.title === "string" &&
+      typeof task.completed === "boolean"
+    );
+  }
+} catch {
+  tasks = [];
+}
+
+const taskForm = document.getElementById("taskForm");
+const taskInput = document.getElementById("taskInput");
+const priorityInput = document.getElementById("priorityInput");
+const dateInput = document.getElementById("dateInput");
+const taskList = document.getElementById("taskList");
+
+document.getElementById("today").textContent =
+  new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+
+function saveTasks() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  } catch {
+    alert("Unable to save tasks in this browser.");
+  }
+}
+
+function renderTasks() {
+  const total = tasks.length;
+  const completed = tasks.filter(task => task.completed).length;
+  const percentage = total ? Math.round(completed / total * 100) : 0;
+
+  document.getElementById("total").textContent = total;
+  document.getElementById("completed").textContent = completed;
+  document.getElementById("percentage").textContent = percentage + "%";
+  document.getElementById("progress").style.width = percentage + "%";
+
+  taskList.replaceChildren();
+
+  const filtered = tasks.filter(task => {
+    if (currentFilter === "active") return !task.completed;
+    if (currentFilter === "completed") return task.completed;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = tasks.length === 0
+      ? "No tasks yet. Add your first task above and get started."
+      : "Nothing here yet. Try another filter.";
+    taskList.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(task => {
+    const row = document.createElement("div");
+    row.className = "task" + (task.completed ? " completed" : "");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "checkbox";
+    checkbox.checked = task.completed;
+    checkbox.setAttribute("aria-label", "Mark task complete");
+
+    checkbox.addEventListener("change", () => {
+      task.completed = checkbox.checked;
+      saveTasks();
+      renderTasks();
+    });
+
+    const content = document.createElement("div");
+    content.className = "task-content";
+
+    const title = document.createElement("div");
+    title.className = "task-title";
+    title.textContent = task.title;
+
+    const meta = document.createElement("div");
+    meta.className = "task-meta";
+
+    const priority = document.createElement("span");
+    const validPriorities = ["Low", "Medium", "High"];
+    priority.className = "priority " +
+      (validPriorities.includes(task.priority) ? task.priority : "Low");
+    priority.textContent = (task.priority || "Low") + " priority";
+
+    meta.appendChild(priority);
+
+    if (task.dueDate) {
+      const due = document.createElement("span");
+      due.className = "tag";
+      due.textContent = "Due: " + task.dueDate;
+      meta.appendChild(due);
+    }
+
+    content.append(title, meta);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "delete-btn";
+    deleteButton.type = "button";
+    deleteButton.textContent = "×";
+    deleteButton.setAttribute("aria-label", "Delete task");
+
+    deleteButton.addEventListener("click", () => {
+      tasks = tasks.filter(item => item.id !== task.id);
+      saveTasks();
+      renderTasks();
+    });
+
+    row.append(checkbox, content, deleteButton);
+    taskList.appendChild(row);
+  });
+}
+
+taskForm.addEventListener("submit", event => {
+  event.preventDefault();
+
+  const title = taskInput.value.trim();
+  if (!title) return;
+
+  tasks.unshift({
+    id: crypto.randomUUID
+      ? crypto.randomUUID()
+      : Date.now().toString() + Math.random().toString(36).slice(2),
+    title,
+    priority: priorityInput.value,
+    dueDate: dateInput.value,
+    completed: false,
+    createdAt: new Date().toISOString()
+  });
+
+  saveTasks();
+  taskInput.value = "";
+  dateInput.value = "";
+  priorityInput.value = "Medium";
+
+  renderTasks();
+  taskInput.focus();
+});
+
+document.querySelectorAll(".filter").forEach(button => {
+  button.addEventListener("click", () => {
+    currentFilter = button.dataset.filter;
+
+    document.querySelectorAll(".filter").forEach(item => {
+      item.classList.toggle("active", item === button);
+    });
+
+    renderTasks();
+  });
+});
+
+renderTasks();
+</script>
+</body>
+</html>
